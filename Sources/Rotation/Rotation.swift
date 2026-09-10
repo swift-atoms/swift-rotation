@@ -1,14 +1,11 @@
 @_exported public import Axis
 @_exported public import Angle
 
-/// An ordered parameterization by proper rotations in coordinate planes.
-/// Coordinate axes must form an orthonormal basis in the interpreting domain.
 public struct Rotation<let N: Int, Scalar: BinaryFloatingPoint> {
     public let planes: [Plane]
     public init(planes: [Plane]) { self.planes = planes }
     public static var identity: Self { Self(planes: []) }
 
-    /// Apply this rotation first, followed by the argument.
     public func followed(by other: Self) -> Self { Self(planes: planes + other.planes) }
     public var inverse: Self { Self(planes: planes.reversed().map(\.inverse)) }
 
@@ -23,7 +20,6 @@ public struct Rotation<let N: Int, Scalar: BinaryFloatingPoint> {
         public let second: Axis<N>
         public let angle: Radian<Scalar>
 
-        /// Positive angle maps the first basis vector toward the second.
         public init(first: Axis<N>, second: Axis<N>, angle: Radian<Scalar>) throws(Error) {
             guard first.underlying >= 0, first.underlying < N,
                   second.underlying >= 0, second.underlying < N else { throw .invalidAxis }
