@@ -4,12 +4,8 @@
 public struct Rotation<let N: Int, Scalar: BinaryFloatingPoint> {
     public let planes: [Plane]
     public init(planes: [Plane]) { self.planes = planes }
-    public static var identity: Self { Self(planes: []) }
 
-    public func followed(by other: Self) -> Self { Self(planes: planes + other.planes) }
-    public var inverse: Self { Self(planes: planes.reversed().map(\.inverse)) }
-
-    public enum Error: Swift.Error, Equatable, Sendable {
+    public enum Error: Swift::Error, Equatable, Sendable {
         case invalidAxis
         case coincidentAxes
         case nonfiniteAngle
@@ -29,11 +25,14 @@ public struct Rotation<let N: Int, Scalar: BinaryFloatingPoint> {
             self.second = second
             self.angle = Radian(_unchecked: angle.underlying == 0 ? 0 : angle.underlying)
         }
-
-        public var inverse: Self {
-            Self(validatedFirst: first, second: second, angle: -angle.underlying)
-        }
     }
+}
+
+extension Rotation {
+    public static var identity: Self { Self(planes: []) }
+
+    public func followed(by other: Self) -> Self { Self(planes: planes + other.planes) }
+    public var inverse: Self { Self(planes: planes.reversed().map(\.inverse)) }
 }
 
 extension Rotation.Plane: Equatable {}
@@ -81,5 +80,11 @@ extension Rotation.Plane {
         self.first = validatedFirst
         self.second = second
         self.angle = Radian(_unchecked: angle == 0 ? 0 : angle)
+    }
+}
+
+extension Rotation.Plane {
+    public var inverse: Self {
+        Self(validatedFirst: first, second: second, angle: -angle.underlying)
     }
 }
