@@ -1,6 +1,6 @@
+import Foundation
 import Rotation
 import Testing
-import Foundation
 
 @Suite struct `Proper rotation contracts` {
     @Test func `Composition preserves plane order and inverse reverses it`() throws {

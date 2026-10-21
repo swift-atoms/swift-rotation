@@ -1,5 +1,5 @@
-@_exported public import Axis
 @_exported public import Angle
+@_exported public import Axis
 
 public struct Rotation<let N: Int, Scalar: BinaryFloatingPoint> {
     public let planes: [Plane]
@@ -18,7 +18,8 @@ public struct Rotation<let N: Int, Scalar: BinaryFloatingPoint> {
 
         public init(first: Axis<N>, second: Axis<N>, angle: Radian<Scalar>) throws(Error) {
             guard first.underlying >= 0, first.underlying < N,
-                  second.underlying >= 0, second.underlying < N else { throw .invalidAxis }
+                second.underlying >= 0, second.underlying < N
+            else { throw .invalidAxis }
             guard first != second else { throw .coincidentAxes }
             guard angle.underlying.isFinite else { throw .nonfiniteAngle }
             self.first = first
@@ -43,32 +44,35 @@ extension Rotation: Hashable where Scalar: Hashable {}
 extension Rotation: Sendable where Scalar: Sendable {}
 
 #if !hasFeature(Embedded)
-extension Rotation.Plane {
-    private enum CodingKeys: String, CodingKey { case first, second, angle }
-}
-extension Rotation.Plane: Encodable where Scalar: Encodable {
-    public func encode(to encoder: any Encoder) throws {
-        var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encode(first.underlying, forKey: .first)
-        try c.encode(second.underlying, forKey: .second)
-        try c.encode(angle.underlying, forKey: .angle)
+    extension Rotation.Plane {
+        private enum CodingKeys: String, CodingKey { case first, second, angle }
     }
-}
-extension Rotation.Plane: Decodable where Scalar: Decodable {
-    public init(from decoder: any Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        let first = try c.decode(Int.self, forKey: .first)
-        let second = try c.decode(Int.self, forKey: .second)
-        let angle = try c.decode(Scalar.self, forKey: .angle)
-        do { try self.init(first: Axis(first), second: Axis(second), angle: Radian(_unchecked: angle)) }
-        catch {
-            throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath,
-                debugDescription: "A rotation plane requires distinct valid axes and a finite angle"))
+    extension Rotation.Plane: Encodable where Scalar: Encodable {
+        public func encode(to encoder: any Encoder) throws {
+            var c = encoder.container(keyedBy: CodingKeys.self)
+            try c.encode(first.underlying, forKey: .first)
+            try c.encode(second.underlying, forKey: .second)
+            try c.encode(angle.underlying, forKey: .angle)
         }
     }
-}
-extension Rotation: Encodable where Scalar: Encodable {}
-extension Rotation: Decodable where Scalar: Decodable {}
+    extension Rotation.Plane: Decodable where Scalar: Decodable {
+        public init(from decoder: any Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            let first = try c.decode(Int.self, forKey: .first)
+            let second = try c.decode(Int.self, forKey: .second)
+            let angle = try c.decode(Scalar.self, forKey: .angle)
+            do { try self.init(first: Axis(first), second: Axis(second), angle: Radian(_unchecked: angle)) } catch {
+                throw DecodingError.dataCorrupted(
+                    .init(
+                        codingPath: decoder.codingPath,
+                        debugDescription: "A rotation plane requires distinct valid axes and a finite angle"
+                    )
+                )
+            }
+        }
+    }
+    extension Rotation: Encodable where Scalar: Encodable {}
+    extension Rotation: Decodable where Scalar: Decodable {}
 #endif
 
 extension Rotation {

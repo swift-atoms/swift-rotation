@@ -10,27 +10,34 @@ let package = Package(
         .package(url: "https://github.com/swift-atoms/swift-angle.git", branch: "main"),
     ],
     targets: [
-        .target(name: "Rotation", dependencies: [
-            .product(name: "Axis", package: "swift-axis"),
-            .product(name: "Angle", package: "swift-angle"),
-        ]),
-        .testTarget(name: "Rotation Tests", dependencies: [
-            .target(name: "Rotation"),
-            .product(name: "Angle", package: "swift-angle"),
-        ]),
+        .target(
+            name: "Rotation",
+            dependencies: [
+                .product(name: "Axis", package: "swift-axis"),
+                .product(name: "Angle", package: "swift-angle"),
+            ]
+        ),
+        .testTarget(
+            name: "Rotation Tests",
+            dependencies: [
+                .target(name: "Rotation"),
+                .product(name: "Angle", package: "swift-angle"),
+            ]
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
 
 for target in package.targets where ![.system, .binary, .plugin, .macro].contains(target.type) {
-    target.swiftSettings = (target.swiftSettings ?? []) + [
-        .strictMemorySafety(),
-        .enableUpcomingFeature("ExistentialAny"),
-        .enableUpcomingFeature("InternalImportsByDefault"),
-        .enableUpcomingFeature("MemberImportVisibility"),
-        .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
-        .enableUpcomingFeature("InferIsolatedConformances"),
-        .enableExperimentalFeature("Lifetimes"),
-        .treatAllWarnings(as: .error),
-    ]
+    target.swiftSettings =
+        (target.swiftSettings ?? []) + [
+            .strictMemorySafety(),
+            .enableUpcomingFeature("ExistentialAny"),
+            .enableUpcomingFeature("InternalImportsByDefault"),
+            .enableUpcomingFeature("MemberImportVisibility"),
+            .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
+            .enableUpcomingFeature("InferIsolatedConformances"),
+            .enableExperimentalFeature("Lifetimes"),
+            .treatAllWarnings(as: .error),
+        ]
 }
